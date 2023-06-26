@@ -3,9 +3,8 @@
 (defpackage #:cl-p5
   (:use #:cl) 
   (:export 
-    ;; Define toplevel p5.js functions
-    #:draw
-    #:setup 
+    ;; Define toplevel p5.js 
+    #:sketch
 
     ;; Create variables
     #:get-var 

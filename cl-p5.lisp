@@ -69,19 +69,26 @@
 
 ;;;; TOPLEVEL 
 
-(defmacro setup (&body body) 
-  "Define setup function for p5.js"
-  `(defun make-setup-function () 
-     (parenscript:ps 
-       (defun setup ()
-         ,@(substitute-variables body)))))
+(defmacro sketch (&body body)
+  "Define sketch route for p5.js"
+  `(hunchentoot:define-easy-handler (sketch-js :uri "/sketch.js") () 
+    (setf (hunchentoot:content-type*) "text/javascript")
+    (concatenate 'string 
+                 (util-functions)
+                 (parenscript:ps 
+                   ,@body))))
 
-(defmacro draw (&body body) 
-  "Define draw function for p5.js"
-  `(defun make-draw-function ()
-     (parenscript:ps 
-       (defun draw ()
-         ,@(substitute-variables body)))))
+(defun util-functions () 
+  (parenscript:ps
+    ;; TODO get data from running image
+    ;; It would be nice if we could make this a macro so instead of (g "x") we could
+    ;; do (g x)
+
+    ;; TODO make a function that can set x as well. (s "x")
+    (defun g (name) 
+      "Get/set data in the environment. Since data is stored in the image, this makes a network request 
+       that "
+      0)))
 
 ;;;; ENVIRONMENT
 
@@ -90,26 +97,40 @@
 ;; TODO Create a list of reservered words so that users 
 ;; don't create variables that shadows p5.js function calls
 
-(defun get-var (sym) 
+(defun get-var (name) 
   "Define a variable in the environment"
-  (gethash sym *env*))
+  (gethash name *env*))
 
-(defmacro set-var (sym value) 
+(defmacro set-var (name value) 
   "Access value of variable in the environment"
-  `(setf (gethash ',sym *env*) ,value))
+  `(setf (gethash name *env*) ,value))
 
 (defun reset-env () 
   "Clear all environment variables"
   (clrhash *env*))
 
-(defun defined-symbols () 
-  "Get list of symbols defined in environment"
-  (alexandria:hash-table-keys *env*))
+(sketch 
+  (let ((x (g "x"))
+        (y (g "y"))
+        (xspeed 1)
+        (yspeed 3.3))
+    
+    (defun setup ()
+      (create-canvas 640 360)
+      (background 255))
+    
+    (defun draw ()
+      (background 255)
 
-(defun substitute-variables (body) 
-  "Replace all occurences of set variables in body. Used when
-   creating the setup/draw functions."
-  (reduce (lambda (body sym)
-            (subst (get-var sym) sym body))
-          (defined-symbols)
-          :initial-value body))
+      (incf x xspeed)
+      (incf y yspeed)
+
+      (when (or (> x width) (< x 0))
+        (setf xspeed  (- xspeed)))
+
+      (when (or (> y height) (< y 0))
+        (setf yspeed  (- yspeed)))
+      
+      (stroke 0)
+      (fill 175)
+      (ellipse x y 16 16))))
