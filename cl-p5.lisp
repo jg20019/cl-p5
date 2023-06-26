@@ -87,19 +87,22 @@
 (defparameter *env* (make-hash-table))
 
 ;; TODO Create a list of reservered words so that users 
-;; don't accidentally create variables that shadow variables 
-;; function calls
+;; don't create variables that shadows p5.js function calls
 
 (defun get-var (sym) 
+  "Define a variable in the environment"
   (gethash sym *env*))
 
 (defmacro set-var (sym value) 
+  "Access value of variable in the environment"
   `(setf (gethash ',sym *env*) ,value))
 
 (defun reset-env () 
+  "Clear all environment variables"
   (clrhash *env*))
 
 (defun defined-symbols () 
+  "Get list of symbols defined in environment"
   (alexandria:hash-table-keys *env*))
 
 (defun substitute-variables (body) 
