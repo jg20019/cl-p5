@@ -75,9 +75,6 @@
        (defun setup ()
          ,@(substitute-variables body)))))
 
-(setup (create-canvas 400 400))
-
-
 (defmacro draw (&body body) 
   "Define draw function for p5.js"
   `(defun make-draw-function ()
