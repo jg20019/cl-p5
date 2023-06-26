@@ -1,5 +1,17 @@
 ;;;; package.lisp
 
 (defpackage #:cl-p5
-  (:use #:cl))
+  (:use #:cl) 
+  (:export 
+    ;; Define toplevel p5.js functions
+    #:draw
+    #:setup 
 
+    ;; Create variables
+    #:get-var 
+    #:set-var
+    #:reset-env
+
+    ;; Running server
+    #:start
+    #:stop))
