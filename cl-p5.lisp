@@ -8,8 +8,9 @@
 
 (defun start (&optional (port 4242))
   "Start the acceptor on given port"
-  (setf *acceptor* (make-instance 'hunchentoot:easy-acceptor :port port))
-  (hunchentoot:start *acceptor*))
+  (unless (and *acceptor* (hunchentoot:started-p *acceptor*))
+    (setf *acceptor* (make-instance 'hunchentoot:easy-acceptor :port port))
+    (hunchentoot:start *acceptor*)))
 
 (defun stop () 
   "Stops server if running."
